@@ -29,6 +29,8 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public static readonly Color IllegalColor = Color.LightCoral;
         public static readonly Color WarningColor = Color.Yellow;
         public static readonly Color GoodColor = Color.Green;
+        public static readonly Color UnhighlightColor = Color.LightGray;
+        public static readonly Color NameColor = Color.LightSteelBlue;
 
         /// <summary>
         ///     Buffer holds strings to be printed
@@ -38,10 +40,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         /// <summary>
         ///     Dictionaries related to HL100 kill counting
         /// </summary>
-        // Kill Number : UUID, Monster Type, Demo File
-        private Dictionary<int, (string, string, string)> MonsterTypeKillByNumber = new Dictionary<int, (string, string, string)>();
-        // Map : [ UUID, Monster Type, Demo File ]
-        private Dictionary<string, List<(string, string, string)>> MonsterTypeKillByMap = new Dictionary<string, List<(string, string, string)>>();
+        // Kill Number : UUID, Monster Type, Monster Name, Map
+        private Dictionary<int, (string, string, string, string)> MonsterTypeKillByNumber = new Dictionary<int, (string, string, string, string)>();
+        // Map : [ UUID, Monster Type ]
+        private Dictionary<string, List<(string, string)>> MonsterTypeKillByMap = new Dictionary<string, List<(string, string)>>();
 
         /// <summary>
         ///     Default constructor
@@ -200,7 +202,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 { "c1a2a", new Dictionary<string, int>
                     {
                         {"monster_headcrab", 10},
-                        {"monster_alien_slave", 12},
+                        {"monster_alien_slave", 11},
                         {"monster_barnacle", 2},
                         {"monster_miniturret", 1},
                         {"monster_zombie", 1},
@@ -210,7 +212,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                     {
                         {"monster_headcrab", 13},
                         {"monster_bullchicken", 1},
-                        {"monster_alien_slave", 2},
+                        {"monster_alien_slave", 3},
                         {"monster_zombie", 4},
                     }
                 },
@@ -314,7 +316,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                     {
                         {"monster_human_grunt", 2},
                         {"monster_alien_slave", 7},
-                        {"monster_headcrab", 9},
+                        {"monster_headcrab", 8},
                         {"monster_gargantua", 1},
                     }
                 },
@@ -537,12 +539,11 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 { "c2a5d", new Dictionary<string, int>
                     {
                         {"monster_headcrab", 3},
-                        {"monster_human_grunt", 2},
                     }
                 },
                 { "c2a5e", new Dictionary<string, int>
                     {
-                        {"monster_human_grunt", 10},
+                        {"monster_human_grunt", 12},
                         {"monster_sentry", 1},
                         {"func_breakable", 2},
                         {"monster_alien_grunt", 8},
@@ -730,6 +731,31 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             }
             textBuffer.Append("\n");
 
+            // Dump the kills by number to the textBuffer so it can be cross referenced with the spreadsheet if needed.
+            textBuffer.Append("\nHL100: Kills by number:\n");
+            foreach (var kill in MonsterTypeKillByNumber)
+            {
+                if (!string.IsNullOrEmpty(kill.Value.Item3))
+                {
+                    textBuffer.Append("  " + kill.Key);
+                    textBuffer.Append(": ", UnhighlightColor);
+                    textBuffer.Append(kill.Value.Item2);
+                    textBuffer.Append("'", UnhighlightColor);
+                    textBuffer.Append(kill.Value.Item3, NameColor);
+                    textBuffer.Append("' killed on ", UnhighlightColor);
+                    textBuffer.Append(kill.Value.Item4 + "\n");
+                }
+                else
+                {
+                    textBuffer.Append("  " + kill.Key);
+                    textBuffer.Append(": ", UnhighlightColor);
+                    textBuffer.Append(kill.Value.Item2);
+                    textBuffer.Append(" killed on ", UnhighlightColor);
+                    textBuffer.Append(kill.Value.Item4 + "\n");
+                }
+            }
+            textBuffer.Append("\n");
+
             // Verify they got exactly totalKills kills
             for (int i = 1; i <= totalKills; i++)
             {
@@ -798,7 +824,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             }
             else if (hasWarnings)
             {
-                textBuffer.Append("\nHL100: Verification passed with warnings. Note that report_to_demo commands can sometimes get missed.\n", WarningColor);
+                textBuffer.Append("\nHL100: Verification passed with warnings. " +
+                    "Note that report_to_demo commands can sometimes get missed, " +
+                    "or kills may happen on the other side of level transitions.\n",
+                    WarningColor);
             }
             else
             {
@@ -1869,12 +1898,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                         }
 
                                         string killUUID = Guid.NewGuid().ToString();
-                                        MonsterTypeKillByNumber[monsterKillNumber] = (killUUID, monsterType, info.Key);
+                                        MonsterTypeKillByNumber[monsterKillNumber] = (killUUID, monsterType, monsterName, monsterKilledOnMap);
                                         if (!MonsterTypeKillByMap.ContainsKey(monsterKilledOnMap))
                                         {
-                                            MonsterTypeKillByMap.Add(monsterKilledOnMap, new List<(string, string, string)>());
+                                            MonsterTypeKillByMap.Add(monsterKilledOnMap, new List<(string, string)>());
                                         }
-                                        MonsterTypeKillByMap[monsterKilledOnMap].Add((killUUID, monsterType, info.Key));
+                                        MonsterTypeKillByMap[monsterKilledOnMap].Add((killUUID, monsterType));
                                     } catch (Exception e)
                                     {
                                         textBuffer.Append("\tError parsing hl100 report_to_demo in " + info.Key + ": " + e.ToString() + "\n");
