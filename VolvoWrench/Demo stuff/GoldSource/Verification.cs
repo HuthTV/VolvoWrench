@@ -761,8 +761,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             {
                 if (!MonsterTypeKillByNumber.ContainsKey(i))
                 {
-                    textBuffer.Append("HL100: Missing kill #" + i + "\n", WarningColor);
-                    hasWarnings = true;
+                    string err = "HL100: Missing kill #" + i + "\n";
+                    Df[files.Last()].GsDemoInfo.ParsingErrors.Add(err);
+                    textBuffer.Append(err, IllegalColor);
+                    hasErrors = true;
                 }
             }
 
@@ -825,8 +827,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             else if (hasWarnings)
             {
                 textBuffer.Append("\nHL100: Verification passed with warnings. " +
-                    "Note that report_to_demo commands can sometimes get missed, " +
-                    "or kills may happen on the other side of level transitions.\n",
+                    "Note that kills may happen on unexpected maps due to crossing level transitions.\n",
                     WarningColor);
             }
             else
