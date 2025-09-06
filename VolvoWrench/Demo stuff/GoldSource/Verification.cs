@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MoreLinq;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using MoreLinq;
 using VolvoWrench.Demo_stuff.GoldSource;
 
 namespace VolvoWrench.Demo_Stuff.GoldSource
@@ -41,7 +40,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         ///     Dictionaries related to HL100 kill counting
         /// </summary>
         // Kill Number : UUID, Monster Type, Monster Name, Map
-        private Dictionary<int, (string, string, string, string)> MonsterTypeKillByNumber = new Dictionary<int, (string, string, string, string)>();
+        private SortedDictionary<int, (string, string, string, string)> MonsterTypeKillByNumber = new SortedDictionary<int, (string, string, string, string)>();
         // Map : [ UUID, Monster Type ]
         private Dictionary<string, List<(string, string)>> MonsterTypeKillByMap = new Dictionary<string, List<(string, string)>>();
 
@@ -106,6 +105,69 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 ni.Visible = true;
                 ni.ShowBalloonTip(5000, "VolvoWrench", "Demo names copied to clipboard", ToolTipIcon.Info);
             }
+        }
+
+        /// <summary>
+        ///     Get chapter short name from level name. HL1 only at the moment.
+        /// </summary>
+        /// <param name="map">Level to find chapter for</param>
+        string MapToChapter(string map)
+        {
+            if (map.StartsWith("c0"))
+                return "AM";
+
+            else if (map == "c1a0" || map == "c1a0d" || map == "c1a0a" || map == "c1a0b" || map == "c1a0c" || map == "c1a0e" ||
+                     map == "c1a1" || map == "c1a1a" || map == "c1a1f" || map == "c1a1b" || map == "c1a1c" || map == "c1a1d")
+                return "UC";
+
+            else if (map == "c1a2" || map == "c1a2a" || map == "c1a2b" || map == "c1a2c" || map == "c1a2d")
+                return "OC";
+
+            else if (map == "c1a3" || map == "c1a3a" || map == "c1a3b" || map == "c1a3c" || map == "c1a3d")
+                return "WGH";
+
+            else if (map == "c1a4" || map == "c1a4k" || map == "c1a4b" || map == "c1a4f" || map == "c1a4d" ||
+                     map == "c1a4e" || map == "c1a4i" || map == "c1a4g" || map == "c1a4j")
+                return "BP";
+
+            else if (map == "c2a1" || map == "c2a1a" || map == "c2a1b")
+                return "PU";
+
+            else if (map == "c2a2" || map == "c2a2a" || map == "c2a2b1" || map == "c2a2b2" || map == "c2a2c" ||
+                     map == "c2a2d" || map == "c2a2e" || map == "c2a2f" || map == "c2a2g" || map == "c2a2h")
+                return "OAR";
+
+            else if (map == "c2a3" || map == "c2a3a" || map == "c2a3b" || map == "c2a3c" || map == "c2a3d" || map == "c2a3e")
+                return "APP";
+
+            else if (map == "c2a4" || map == "c2a4a" || map == "c2a4b" || map == "c2a4c")
+                return "RP";
+
+            else if (map == "c2a4d" || map == "c2a4e" || map == "c2a4f" || map == "c2a4g")
+                return "QE";
+
+            else if (map == "c2a5" || map == "c2a5w" || map == "c2a5x" || map == "c2a5a" || map == "c2a5b" ||
+                     map == "c2a5c" || map == "c2a5d" || map == "c2a5e" || map == "c2a5f" || map == "c2a5g")
+                return "ST";
+
+            else if (map == "c3a1" || map == "c3a1a" || map == "c3a1b")
+                return "FAF";
+
+            else if (map == "c3a2e" || map == "c3a2" || map == "c3a2a" || map == "c3a2b" || map == "c3a2c" ||
+                     map == "c3a2d" || map == "c3a2f")
+                return "LC";
+
+            else if (map == "c4a1")
+                return "XEN";
+
+            else if (map == "c4a1" || map == "c4a2" || map == "c4a2a" || map == "c4a2b")
+                return "GL";
+
+            else if (map == "c4a1a" || map == "c4a1b" || map == "c4a1c" || map == "c4a1d" || map == "c4a1e" || map == "c4a1f")
+                return "INT";
+
+            else
+                return "END";
         }
 
         /// <summary>
@@ -701,6 +763,174 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 },
             };
 
+            Dictionary<string, Dictionary<string, int>> referenceMonsterCountsByChapter = new Dictionary<string, Dictionary<string, int>>
+            {
+                { "UC", new Dictionary<string, int>
+                    {
+                        {"monster_alien_slave", 1},
+                        {"monster_barnacle", 7},
+                        {"monster_bullchicken", 2},
+                        {"monster_headcrab", 24},
+                        {"monster_houndeye", 5},
+                        {"monster_zombie", 9},
+                    }
+                },
+                { "OC", new Dictionary<string, int>
+                    {
+                        {"monster_alien_slave", 14},
+                        {"monster_barnacle", 9},
+                        {"monster_bullchicken", 3},
+                        {"monster_headcrab", 53},
+                        {"monster_miniturret", 2},
+                        {"monster_zombie", 9},
+                    }
+                },
+                { "WGH", new Dictionary<string, int>
+                    {
+                        {"monster_alien_slave", 2},
+                        {"monster_barnacle", 11},
+                        {"monster_headcrab", 4},
+                        {"monster_human_grunt", 19},
+                        {"monster_osprey", 2},
+                        {"monster_sentry", 10},
+                        {"monster_zombie", 1},
+                    }
+                },
+                { "BP", new Dictionary<string, int>
+                    {
+                        {"monster_barnacle", 5},
+                        {"monster_bullchicken", 15},
+                        {"monster_headcrab", 14},
+                        {"monster_houndeye", 14},
+                        {"monster_tentacle", 3},
+                        {"monster_zombie", 13},
+                    }
+                },
+                { "PU", new Dictionary<string, int>
+                    {
+                        {"monster_alien_slave", 9},
+                        {"monster_bullchicken", 1},
+                        {"monster_gargantua", 1},
+                        {"monster_headcrab", 12},
+                        {"monster_houndeye", 5},
+                        {"monster_human_grunt", 19},
+                        {"monster_sentry", 1},
+                        {"monster_zombie", 1},
+                    }
+                },
+                { "OAR", new Dictionary<string, int>
+                    {
+                        {"func_breakable", 1},
+                        {"monster_alien_slave", 22},
+                        {"monster_barnacle", 12},
+                        {"monster_bullchicken", 10},
+                        {"monster_headcrab", 20},
+                        {"monster_houndeye", 8},
+                        {"monster_human_grunt", 47},
+                        {"monster_sentry", 10},
+                        {"monster_zombie", 2},
+                    }
+                },
+                { "APP", new Dictionary<string, int>
+                    {
+                        {"monster_alien_slave", 13},
+                        {"monster_barnacle", 13},
+                        {"monster_bullchicken", 3},
+                        {"monster_headcrab", 7},
+                        {"monster_human_assassin", 3},
+                        {"monster_ichthyosaur", 3},
+                        {"monster_zombie", 2},
+                    }
+                },
+                { "RP", new Dictionary<string, int>
+                    {
+                        {"monster_barnacle", 10},
+                        {"monster_bullchicken", 5},
+                        {"monster_headcrab", 10},
+                    }
+                },
+                { "QE", new Dictionary<string, int>
+                    {
+                        {"monster_alien_grunt", 3},
+                        {"monster_headcrab", 19},
+                        {"monster_houndeye", 9},
+                        {"monster_human_grunt", 17},
+                        {"monster_sentry", 2},
+                    }
+                },
+                { "ST", new Dictionary<string, int>
+                    {
+                        {"func_breakable", 7},
+                        {"monster_alien_grunt", 19},
+                        {"monster_alien_slave", 13},
+                        {"monster_apache", 3},
+                        {"monster_gargantua", 1},
+                        {"monster_headcrab", 18},
+                        {"monster_houndeye", 1},
+                        {"monster_human_grunt", 58},
+                        {"monster_ichthyosaur", 1},
+                        {"monster_osprey", 1},
+                        {"monster_sentry", 2},
+                    }
+                },
+                { "FAF", new Dictionary<string, int>
+                    {
+                        {"func_breakable", 2},
+                        {"monster_alien_grunt", 14},
+                        {"monster_alien_slave", 8},
+                        {"monster_barnacle", 5},
+                        {"monster_headcrab", 5},
+                        {"monster_human_grunt", 8},
+                        {"monster_ichthyosaur", 1},
+                        {"monster_sentry", 3},
+                        {"monster_turret", 1},
+                    }
+                },
+                { "LC", new Dictionary<string, int>
+                    {
+                        {"monster_alien_controller", 3},
+                        {"monster_alien_grunt", 20},
+                        {"monster_alien_slave", 13},
+                        {"monster_barnacle", 6},
+                        {"monster_bullchicken", 2},
+                        {"monster_headcrab", 25},
+                    }
+                },
+                { "XEN", new Dictionary<string, int>
+                    {
+                        {"func_breakable", 4},
+                        {"monster_alien_slave", 2},
+                        {"monster_houndeye", 5},
+                    }
+                },
+                { "GL", new Dictionary<string, int>
+                    {
+                        {"monster_bigmomma", 1},
+                        {"monster_headcrab", 5},
+                    }
+                },
+                { "INT", new Dictionary<string, int>
+                    {
+                        {"monster_alien_controller", 28},
+                        {"monster_alien_grunt", 26},
+                        {"monster_alien_slave", 48},
+                        {"monster_barnacle", 6},
+                        {"monster_bullchicken", 1},
+                        {"monster_gargantua", 1},
+                        {"monster_headcrab", 2},
+                    }
+                },
+                { "END", new Dictionary<string, int>
+                    {
+                        {"monster_alien_controller", 8},
+                        {"monster_alien_slave", 3},
+                        {"monster_gargantua", 1},
+                        {"monster_ichthyosaur", 1},
+                        {"monster_nihilanth", 1},
+                    }
+                },
+            };
+
             Dictionary<string, Dictionary<string, int>> monsterCountsByMap = new Dictionary<string, Dictionary<string, int>>();
 
             // Build dict of kills of by map and monster type
@@ -720,39 +950,127 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 }
             }
 
-            // Dump the kills by map to the textBuffer so it can be cross referenced with the spreadsheet if needed.
-            foreach (var map in monsterCountsByMap)
+            List<(string, Color)> killsByCountLines = new List<(string, Color)>();
+            List<(string, Color)> killsByMapLines = new List<(string, Color)>();
+            List<(string, Color)> killsByChapterLines = new List<(string, Color)>();
+
+            textBuffer.Append("HL100 Kill table:\n");
+            // Dump the kills by map to the output so it can be cross referenced with the spreadsheet if needed.
+            foreach (var map in referenceMonsterCountsByMap)
             {
-                textBuffer.Append("\nHL100: Kills on " + map.Key + "\n");
-                foreach (var kill in monsterCountsByMap[map.Key])
+                killsByMapLines.Add(($"Kills on {map.Key}:", Color.White));
+                foreach (var kill in referenceMonsterCountsByMap[map.Key])
                 {
-                    textBuffer.Append("  " + kill.Key + ": " + kill.Value + "\n");
+                    int actualKills = 0;
+                    if (monsterCountsByMap.ContainsKey(map.Key) && monsterCountsByMap[map.Key].ContainsKey(kill.Key))
+                    {
+                        actualKills = monsterCountsByMap[map.Key][kill.Key];
+                    }
+                    Color c = Color.White;
+                    if (actualKills != kill.Value)
+                    {
+                        c = WarningColor;
+                    }
+                    killsByMapLines.Add(($"  {kill.Key}: {actualKills} (Expected: {kill.Value})", c));
+                }
+                killsByMapLines.Add(("", Color.White));
+            }
+
+            var monsterCountsByChapter = new Dictionary<string, Dictionary<string, int>>();
+
+            foreach (var kv in monsterCountsByMap)
+            {
+                var mapName = kv.Key;
+                var monsters = kv.Value;
+                var chapter = MapToChapter(mapName);
+
+                if (!monsterCountsByChapter.TryGetValue(chapter, out var chapterDict))
+                {
+                    chapterDict = new Dictionary<string, int>();
+                    monsterCountsByChapter[chapter] = chapterDict;
+                }
+
+                foreach (var m in monsters)
+                {
+                    if (chapterDict.ContainsKey(m.Key))
+                        chapterDict[m.Key] += m.Value;
+                    else
+                        chapterDict[m.Key] = m.Value;
                 }
             }
-            textBuffer.Append("\n");
+
+            // Dump monsters by chapter to the textBuffer
+            foreach (var chapter in referenceMonsterCountsByChapter)
+            {
+                killsByChapterLines.Add(($"Kills on {chapter.Key}:", Color.White));
+                foreach (var m in chapter.Value)
+                {
+                    int actualKills = 0;
+                    if (monsterCountsByChapter.ContainsKey(chapter.Key) && monsterCountsByChapter[chapter.Key].ContainsKey(m.Key))
+                    {
+                        actualKills = monsterCountsByChapter[chapter.Key][m.Key];
+                    }
+                    Color c = Color.White;
+                    if (actualKills != m.Value)
+                    {
+                        c = WarningColor;
+                    }
+                    killsByChapterLines.Add(($"  {m.Key}: {actualKills} (Expected: {m.Value})", c));
+                }
+                killsByChapterLines.Add(("", Color.White));
+                killsByChapterLines.Add(("", Color.White));
+            }
 
             // Dump the kills by number to the textBuffer so it can be cross referenced with the spreadsheet if needed.
-            textBuffer.Append("\nHL100: Kills by number:\n");
+            killsByCountLines.Add(("Kills by number:", Color.White));
             foreach (var kill in MonsterTypeKillByNumber)
             {
                 if (!string.IsNullOrEmpty(kill.Value.Item3))
                 {
-                    textBuffer.Append("  " + kill.Key);
-                    textBuffer.Append(": ", UnhighlightColor);
-                    textBuffer.Append(kill.Value.Item2);
-                    textBuffer.Append("'", UnhighlightColor);
-                    textBuffer.Append(kill.Value.Item3, NameColor);
-                    textBuffer.Append("' killed on ", UnhighlightColor);
-                    textBuffer.Append(kill.Value.Item4 + "\n");
+                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} '{kill.Value.Item3}' killed on {kill.Value.Item4}", Color.White));
                 }
                 else
                 {
-                    textBuffer.Append("  " + kill.Key);
-                    textBuffer.Append(": ", UnhighlightColor);
-                    textBuffer.Append(kill.Value.Item2);
-                    textBuffer.Append(" killed on ", UnhighlightColor);
-                    textBuffer.Append(kill.Value.Item4 + "\n");
+                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} killed on {kill.Value.Item4}", Color.White));
                 }
+            }
+
+            // Format as a more easily-readable table
+            for (int i = 0; i < Math.Max(killsByChapterLines.Count(), Math.Max(killsByMapLines.Count(), killsByCountLines.Count())); i++)
+            {
+                
+                if (i < killsByCountLines.Count())
+                {
+                    textBuffer.Append(killsByCountLines[i].Item1.PadRight(70), killsByCountLines[i].Item2);
+                }
+                else
+                {
+                    textBuffer.Append("".PadRight(70));
+                }
+
+                textBuffer.Append(" | ");
+
+                if (i < killsByMapLines.Count())
+                {
+                    textBuffer.Append(killsByMapLines[i].Item1.PadRight(50), killsByMapLines[i].Item2);
+                }
+                else
+                {
+                    textBuffer.Append("".PadRight(50));
+                }
+
+                textBuffer.Append(" | ");
+
+                if (i < killsByChapterLines.Count())
+                {
+                    textBuffer.Append(killsByChapterLines[i].Item1.PadRight(50), killsByChapterLines[i].Item2);
+                }
+                else
+                {
+                    textBuffer.Append("".PadRight(50));
+                }
+
+                textBuffer.Append("\n");
             }
             textBuffer.Append("\n");
 
@@ -768,6 +1086,19 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 }
             }
 
+            // Verify there weren't any illegally bound report_to_demo commands
+            foreach (var df in Df)
+            {
+                foreach (var cheat in df.Value.GsDemoInfo.Cheats)
+                {
+                    if (cheat.ToUpper().Contains("REPORT_TO_DEMO"))
+                    {
+                        hasErrors = true;
+                    }
+                }
+            }
+
+            // Check for extra kills
             if (MonsterTypeKillByNumber.Count() > totalKills)
             {
                 // Add error to last demo for extra kills
@@ -846,6 +1177,8 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             Df.Clear();
             MonsterTypeKillByNumber.Clear();
             MonsterTypeKillByMap.Clear();
+            mrtb.Font = new Font("Consolas", 12, FontStyle.Regular); // Need a monospaced font for table output
+            mrtb.WordWrap = false;
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
             var curr = 0;
             foreach (var dt in files.Where(file => File.Exists(file) && Path.GetExtension(file) == ".dem"))
@@ -1730,6 +2063,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 if (command.ToUpper().Contains(";"))
                                 {
                                     textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
+                                }
+                                if (command.ToUpper().Contains("REPORT_TO_DEMO"))
+                                {
+                                    textBuffer.Append("HL100: Illegal bound report_to_demo command!\n", IllegalColor);
+                                    info.Value.GsDemoInfo.Cheats.Add(command);
+
                                 }
                                 datanode.Nodes.Add(new TreeNode("Bound command: " + command)
                                 {
