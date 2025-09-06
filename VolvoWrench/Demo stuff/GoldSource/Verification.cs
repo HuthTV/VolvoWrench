@@ -25,11 +25,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         /// <summary>
         ///     Static color definitions
         /// </summary>
+        public static readonly Color DefaultColor = Color.White;
         public static readonly Color IllegalColor = Color.LightCoral;
         public static readonly Color WarningColor = Color.Yellow;
         public static readonly Color GoodColor = Color.Green;
-        public static readonly Color UnhighlightColor = Color.LightGray;
-        public static readonly Color NameColor = Color.LightSteelBlue;
 
         /// <summary>
         ///     Buffer holds strings to be printed
@@ -958,7 +957,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             // Dump the kills by map to the output so it can be cross referenced with the spreadsheet if needed.
             foreach (var map in referenceMonsterCountsByMap)
             {
-                killsByMapLines.Add(($"Kills on {map.Key}:", Color.White));
+                killsByMapLines.Add(($"Kills on {map.Key}:", DefaultColor));
                 foreach (var kill in referenceMonsterCountsByMap[map.Key])
                 {
                     int actualKills = 0;
@@ -966,14 +965,14 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                     {
                         actualKills = monsterCountsByMap[map.Key][kill.Key];
                     }
-                    Color c = Color.White;
+                    Color c = DefaultColor;
                     if (actualKills != kill.Value)
                     {
                         c = WarningColor;
                     }
                     killsByMapLines.Add(($"  {kill.Key}: {actualKills} (Expected: {kill.Value})", c));
                 }
-                killsByMapLines.Add(("", Color.White));
+                killsByMapLines.Add(("", DefaultColor));
             }
 
             var monsterCountsByChapter = new Dictionary<string, Dictionary<string, int>>();
@@ -1002,7 +1001,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             // Dump monsters by chapter to the textBuffer
             foreach (var chapter in referenceMonsterCountsByChapter)
             {
-                killsByChapterLines.Add(($"Kills on {chapter.Key}:", Color.White));
+                killsByChapterLines.Add(($"Kills on {chapter.Key}:", DefaultColor));
                 foreach (var m in chapter.Value)
                 {
                     int actualKills = 0;
@@ -1010,28 +1009,28 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                     {
                         actualKills = monsterCountsByChapter[chapter.Key][m.Key];
                     }
-                    Color c = Color.White;
+                    Color c = DefaultColor;
                     if (actualKills != m.Value)
                     {
                         c = WarningColor;
                     }
                     killsByChapterLines.Add(($"  {m.Key}: {actualKills} (Expected: {m.Value})", c));
                 }
-                killsByChapterLines.Add(("", Color.White));
-                killsByChapterLines.Add(("", Color.White));
+                killsByChapterLines.Add(("", DefaultColor));
+                killsByChapterLines.Add(("", DefaultColor));
             }
 
             // Dump the kills by number to the textBuffer so it can be cross referenced with the spreadsheet if needed.
-            killsByCountLines.Add(("Kills by number:", Color.White));
+            killsByCountLines.Add(("Kills by number:", DefaultColor));
             foreach (var kill in MonsterTypeKillByNumber)
             {
                 if (!string.IsNullOrEmpty(kill.Value.Item3))
                 {
-                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} '{kill.Value.Item3}' killed on {kill.Value.Item4}", Color.White));
+                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} '{kill.Value.Item3}' killed on {kill.Value.Item4}", DefaultColor));
                 }
                 else
                 {
-                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} killed on {kill.Value.Item4}", Color.White));
+                    killsByCountLines.Add(($"  {kill.Key}: {kill.Value.Item2} killed on {kill.Value.Item4}", DefaultColor));
                 }
             }
 
